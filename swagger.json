@@ -1,0 +1,435 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Documentation",
+    "description": "Provides API for app",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost",
+      "description": "Local"
+    }
+  ],
+  "paths": {
+    "/api/v1/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login account",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              },
+              "examples": {
+                "account": {
+                  "value": {
+                    "email": "hello@sample.company",
+                    "password": "password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "uuid": { "type": "string", "format": "uuid" },
+                    "email": { "type": "string", "format": "email" },
+                    "name": { "type": "string" },
+                    "picture": { "type": "string" },
+                    "access_token": { "type": "string" }
+                  }
+                },
+                "example": {
+                  "id": 1,
+                  "uuid": "9be09a47-c036-48fe-94b6-64d5bca330ba",
+                  "email": "hello@sample.company",
+                  "name": "John Doe",
+                  "picture": "https://ui-avatars.com/api/?length=1&background=6366f1&color=fff&name=John",
+                  "access_token": "1|OHld6IRPQRBeBZutPUftlasckgA6za5pXOMxhW4G9ad9d97e"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" }
+        }
+      }
+    },
+    "/api/v1/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Logout account",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "OK" },
+          "401": { "$ref": "#/components/responses/401" }
+        }
+      }
+    },
+    "/api/v1/profile": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Get account detail",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/models/userModel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" }
+        }
+      },
+      "put": {
+        "tags": ["Profile"],
+        "summary": "Update profile",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "required": true },
+                  "email": { "type": "string", "format": "email", "required": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Update successful"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Profile"],
+        "summary": "Update avatar",
+        "security": []
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get a list of the user with pagination",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "query",
+            "name": "or_search[name]",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "name": "or_search[email]",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/models/userModel"
+                      }
+                    },
+                    "links": {
+                      "$ref": "#/components/pagination/links"
+                    },
+                    "meta": {
+                      "$ref": "#/components/pagination/meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create a new user",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "required": true },
+                  "email": { "type": "string", "required": true },
+                  "password": { "type": "string", "required": true },
+                  "password_confirmation": { "type": "string", "required": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Create successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/models/userModel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" }
+        }
+      }
+    },
+    "/api/v1/accounts/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get a specified account",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/models/userModel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" },
+          "404": { "$ref": "#/components/responses/404" }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update a specified account",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "required": true },
+                  "email": { "type": "string", "required": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Update successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/components/models/userModel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete a specified account",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }, { "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": { "description": "Delete successful" },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "401": {
+        "description": "Unauthenticated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": { "message": { "type": "string" } }
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": { "message": { "type": "string" } }
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": { "message": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "pagination": {
+      "meta": {
+        "type": "object",
+        "properties": {
+          "current_page": { "type": "integer", "default": 1 },
+          "from": { "type": "integer", "default": 1 },
+          "last_page": { "type": "integer", "default": 1 },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": { "type": "string" },
+                "label": { "type": "string" },
+                "active": { "type": "boolean" }
+              }
+            }
+          },
+          "path": { "type": "string" },
+          "per_page": { "type": "integer", "default": 10 },
+          "to": { "type": "integer", "default": 1 },
+          "total": { "type": "integer", "default": 1 }
+        }
+      },
+      "links": {
+        "type": "object",
+        "properties": {
+          "first": { "type": "string" },
+          "last": { "type": "string" },
+          "prev": { "type": "string", "nullable": true },
+          "next": { "type": "string", "nullable": true }
+        }
+      }
+    },
+    "securitySchemes": {
+      "appIdAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-App-Id"
+      },
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key"
+      },
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "models": {
+      "userModel": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "uuid": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string" },
+          "picture": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}
