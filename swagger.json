@@ -66,7 +66,8 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/401" }
+          "401": { "$ref": "#/components/responses/401" },
+          "422": { "$ref": "#/components/responses/422" }
         }
       }
     },
@@ -109,7 +110,8 @@
                 }
               }
             }
-          }
+          },
+          "422": { "$ref": "#/components/responses/422" }
         }
       }
     },
@@ -144,7 +146,8 @@
                 }
               }
             }
-          }
+          },
+          "422": { "$ref": "#/components/responses/422" }
         }
       }
     },
@@ -176,7 +179,8 @@
                 }
               }
             }
-          }
+          },
+          "422": { "$ref": "#/components/responses/422" }
         }
       }
     },
@@ -262,7 +266,8 @@
         "responses": {
           "204": {
             "description": "Update successful"
-          }
+          },
+          "422": { "$ref": "#/components/responses/422" }
         }
       }
     },
@@ -300,7 +305,8 @@
                 }
               }
             }
-          }
+          },
+          "422": { "$ref": "#/components/responses/422" }
         }
       },
       "delete": {
@@ -343,7 +349,8 @@
               }
             }
           },
-          "401": { "$ref": "#/components/responses/401" }
+          "401": { "$ref": "#/components/responses/401" },
+          "422": { "$ref": "#/components/responses/422" }
         }
       }
     },
@@ -448,7 +455,8 @@
             }
           },
           "401": { "$ref": "#/components/responses/401" },
-          "403": { "$ref": "#/components/responses/403" }
+          "403": { "$ref": "#/components/responses/403" },
+          "422": { "$ref": "#/components/responses/422" }
         }
       }
     },
@@ -530,7 +538,9 @@
             }
           },
           "401": { "$ref": "#/components/responses/401" },
-          "403": { "$ref": "#/components/responses/403" }
+          "403": { "$ref": "#/components/responses/403" },
+          "404": { "$ref": "#/components/responses/404" },
+          "422": { "$ref": "#/components/responses/422" }
         }
       },
       "patch": {
@@ -577,6 +587,22 @@
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Update successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/responses/message"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" },
+          "404": { "$ref": "#/components/responses/404" },
+          "422": { "$ref": "#/components/responses/422" }
         }
       },
       "delete": {
@@ -595,6 +621,232 @@
           "204": { "description": "Delete successful" },
           "401": { "$ref": "#/components/responses/401" },
           "403": { "$ref": "#/components/responses/403" }
+        }
+      }
+    },
+    "/api/v1/roles": {
+      "get": {
+        "tags": ["Roles"],
+        "summary": "Get a list of the role",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "query",
+            "name": "per_page",
+            "schema": { "type": "integer" }
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "description": "The keyword searched by name",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "name": "sort_field",
+            "description": "The field name will be sorted",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "name": "sort_direction",
+            "description": "The value of the direction to sort",
+            "schema": { "type": "string", "enum": ["asc", "desc"], "default": "asc" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/models/roleModel"
+                      }
+                    },
+                    "links": { "$ref": "#/components/pagination/links" },
+                    "meta": { "$ref": "#/components/pagination/meta" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Roles"],
+        "summary": "Create a new role",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [], "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "required": true },
+                  "users": { "type": "array", "items": { "type": "integer" } },
+                  "permissions": { "type": "array", "items": { "type": "integer" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Create successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/models/roleWithRelationModel"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" },
+          "422": { "$ref": "#/components/responses/422" }
+        }
+      }
+    },
+    "/api/v1/roles/{id}": {
+      "get": {
+        "tags": ["Roles"],
+        "summary": "Get a specified role",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "$ref": "#/components/models/roleWithRelationModel"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" },
+          "404": { "$ref": "#/components/responses/404" }
+        }
+      },
+      "put": {
+        "tags": ["Roles"],
+        "summary": "Update a specified role",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "required": true },
+                  "users": { "type": "array", "items": { "type": "integer" } },
+                  "permissions": { "type": "array", "items": { "type": "integer" } }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/models/roleWithRelationModel"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/401" },
+          "403": { "$ref": "#/components/responses/403" },
+          "404": { "$ref": "#/components/responses/404" },
+          "422": { "$ref": "#/components/responses/422" }
+        }
+      },
+      "delete": {
+        "tags": ["Roles"],
+        "summary": "Delete a specified role",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [], "bearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": { "type": "integer" },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": { "description": "Delete successful" }
+        }
+      }
+    },
+    "/api/v1/options/{model}": {
+      "get": {
+        "tags": ["Options"],
+        "summary": "Get a list for selection",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model",
+            "schema": { "type": "string", "enum": ["user", "role", "permission"] },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "keyword",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/models/optionModel"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -636,6 +888,25 @@
             "schema": {
               "type": "object",
               "properties": { "message": { "type": "string" } }
+            }
+          }
+        }
+      },
+      "422": {
+        "description": "Unprocessable Content",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" },
+                "errors": {
+                  "type": "object",
+                  "properties": {
+                    "[filed_name]": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
             }
           }
         }
@@ -703,6 +974,45 @@
           "status": { "type": "integer", "enum": [0, 1], "default": 1 },
           "created_at": { "type": "string", "format": "date-time" },
           "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "roleModel": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "guard_name": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "permissionModel": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "guard_name": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "roleWithRelationModel": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "guard_name": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "users": { "type": "array", "items": { "$ref": "#/components/models/userModel" } },
+          "permissions": { "type": "array", "items": { "$ref": "#/components/models/permissionModel" } }
+        }
+      },
+      "optionModel": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": "string" }
         }
       }
     }
