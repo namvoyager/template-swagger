@@ -181,7 +181,7 @@
       }
     },
     "/api/v1/email/verify/{id}/{hash}": {
-      "get": {
+      "head": {
         "tags": ["Auth"],
         "summary": "Verify the email",
         "parameters": [
@@ -212,20 +212,13 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/responses/message"
-                }
-              }
-            }
+          "204": {
+            "description": "OK"
           }
         }
       }
     },
-    "/api/v1/profile": {
+    "/api/v1/user/profile": {
       "get": {
         "tags": ["Profile"],
         "summary": "Get the user profile",
@@ -271,7 +264,9 @@
             "description": "Update successful"
           }
         }
-      },
+      }
+    },
+    "/api/v1/user/avatar": {
       "post": {
         "tags": ["Profile"],
         "summary": "Update avatar",
@@ -306,6 +301,14 @@
               }
             }
           }
+        }
+      },
+      "delete": {
+        "tags": ["Profile"],
+        "summary": "Remove avatar",
+        "security": [{ "appIdAuth": [], "apiKeyAuth": [], "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Remove successful" }
         }
       }
     },
